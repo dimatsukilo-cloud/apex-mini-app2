@@ -41,15 +41,21 @@
                 tg.showAlert("у тебя нет активной подписки. купи её в боте!");
                 return;
             }
-            
-            // Магия: перекидываем ключ в систему, чтобы Happ Proxy его подхватил
-            window.location.href = vpnKey;
-            
+
+            // Магия: используем метод Telegram, чтобы не было ошибки неизвестного протокола
+            // Это заставит систему перехватить vless:// и открыть Happ Proxy
+            if (tg.openLink) {
+                tg.openLink(vpnKey);
+            } else {
+                window.location.href = vpnKey;
+            }
+
             document.getElementById('status').innerText = 'ON';
             document.getElementById('status').className = 'status-on';
             tg.HapticFeedback.notificationOccurred('success');
-            
-            setTimeout(() => { tg.close(); }, 1500); // закрываем апп через 1.5 сек после клика
+
+            // Небольшая задержка перед закрытием, чтобы пользователь увидел смену статуса
+            setTimeout(() => { tg.close(); }, 1500); 
         }
     </script>
 </body>
