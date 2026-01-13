@@ -9,7 +9,7 @@
         body { background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .card { background: #111; padding: 30px; border-radius: 25px; border: 1px solid #222; width: 85%; text-align: center; }
         .btn { background: linear-gradient(45deg, #ff3300, #ff0055); border: none; color: white; padding: 20px; width: 100%; border-radius: 15px; font-weight: 800; margin-top: 20px; cursor: pointer; text-transform: uppercase; }
-        .btn-down { background: #222; font-size: 12px; padding: 12px; margin-top: 10px; border: 1px solid #333; color: #aaa; width: 100%; border-radius: 10px; }
+        .btn-down { background: #222; font-size: 12px; padding: 12px; margin-top: 10px; border: 1px solid #333; color: #aaa; width: 100%; border-radius: 10px; cursor: pointer; }
         .status-on { color: #00ff88; font-weight: bold; }
     </style>
 </head>
@@ -33,7 +33,9 @@
         if (tg.initDataUnsafe?.user) {
             document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
-        if (expiryDate && expiryDate !== "none") {
+        
+        // проверяем дату, чтобы не выводилось "не"
+        if (expiryDate && expiryDate !== "none" && expiryDate !== "не" && expiryDate !== "не активна") {
             document.getElementById('expiry').innerText = expiryDate.split(' ')[0];
         }
 
@@ -51,16 +53,17 @@
             document.execCommand('copy');
             document.body.removeChild(el);
 
-            tg.showAlert("ключ скопирован! открываем Happ Proxy...");
-            
-            setTimeout(() => { 
-                tg.openLink(vpnKey);
-                tg.close();
-            }, 1500);
+            // используем подтверждение для надежного открытия ссылки
+            tg.showConfirm("ключ скопирован! открыть Happ Proxy?", function(ok) {
+                if (ok) {
+                    tg.openLink(vpnKey);
+                }
+            });
         }
 
         function downloadHapp() {
-            tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android");
+            // форсируем открытие внешней ссылки через метод TG
+            tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android", {try_instant_view: false});
         }
     </script>
 </body>
