@@ -6,10 +6,10 @@
     <title>Apex VPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; margin-top: 50px; }
-        .btn { background: #ff3300; color: #fff; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        .btn-down { background: #222; color: #888; font-size: 12px; margin-top: 10px; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; width: 90%; max-width: 400px; }
+        .btn { background: linear-gradient(45deg, #ff3300, #ff0055); color: #fff; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; text-transform: uppercase; }
+        .btn-down { background: #222; color: #888; font-size: 12px; margin-top: 10px; border: 1px solid #333; }
         #expiry { color: #00ff88; font-weight: bold; }
     </style>
 </head>
@@ -17,7 +17,7 @@
     <div class="card">
         <h2 id="name">привет!</h2>
         <p>статус: <span style="color:#00ff88">READY</span></p>
-        <p>подписка до: <br><span id="expiry">загрузка...</span></p>
+        <p style="font-size: 14px; color: #555;">подписка до: <br><span id="expiry">загрузка...</span></p>
         <button class="btn" onclick="connect()">ПОДКЛЮЧИТЬ VPN</button>
         <button class="btn btn-down" onclick="download()">СКАЧАТЬ HAPP PROXY</button>
     </div>
@@ -30,12 +30,10 @@
         const key = params.get('key');
         const exp = params.get('expiry');
 
-        // выводим имя
         if (tg.initDataUnsafe?.user) {
             document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
 
-        // выводим дату
         if (exp && exp !== "none" && exp !== "не") {
             document.getElementById('expiry').innerText = exp.split(' ')[0];
         } else {
@@ -44,10 +42,9 @@
 
         function connect() {
             if (!key || key === "none") {
-                tg.showAlert("сначала купи подписку!");
+                tg.showAlert("у тебя нет активной подписки!");
                 return;
             }
-            // копируем ключ
             const i = document.createElement('input');
             i.value = key;
             document.body.appendChild(i);
@@ -55,13 +52,12 @@
             document.execCommand('copy');
             document.body.removeChild(i);
 
-            tg.showConfirm("ключ скопирован! открыть приложение?", (ok) => {
+            tg.showConfirm("ключ скопирован! открыть Happ Proxy?", (ok) => {
                 if (ok) tg.openLink(key);
             });
         }
 
         function download() {
-            // открываем напрямую через метод телеграма
             tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android", {try_instant_view: false});
         }
     </script>
