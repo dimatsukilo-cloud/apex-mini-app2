@@ -34,9 +34,7 @@
             document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
 
-        // проверяем дату, чтобы не выводилось слово "не" или пустые поля
         if (expiryDate && expiryDate !== "none" && expiryDate !== "не" && expiryDate !== "не активна") {
-            // берем только дату, отсекая время для компактности
             document.getElementById('expiry').innerText = expiryDate.split(' ')[0];
         } else {
             document.getElementById('expiry').innerText = "не активна";
@@ -48,7 +46,6 @@
                 return;
             }
 
-            // копируем ключ в буфер обмена для подстраховки
             const el = document.createElement('textarea');
             el.value = vpnKey;
             document.body.appendChild(el);
@@ -56,7 +53,6 @@
             document.execCommand('copy');
             document.body.removeChild(el);
 
-            // через confirm ссылка открывается гораздо стабильнее
             tg.showConfirm("ключ скопирован! открыть Happ Proxy?", function(ok) {
                 if (ok) {
                     tg.openLink(vpnKey);
@@ -65,7 +61,6 @@
         }
 
         function downloadHapp() {
-            // важный параметр для обхода ошибки "файл не найден"
             tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android", {try_instant_view: false});
         }
     </script>
