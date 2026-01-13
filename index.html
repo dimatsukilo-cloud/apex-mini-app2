@@ -81,3 +81,12 @@
             // Закрываем мини-апп через пару секунд, чтобы юзер успел понять, что произошло
             setTimeout(() => { tg.close(); }, 3000);
         }
+
+        function downloadHapp() {
+            // Ссылка на Android версию. Для iOS можно добавить проверку платформы, 
+            // но для начала хватит и этой.
+            tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android");
+        }
+    </script>
+</body>
+</html>
