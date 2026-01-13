@@ -3,37 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex VPN</title>
+    <title>Apex VPN Control</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #111; padding: 30px; border-radius: 25px; border: 1px solid #222; width: 85%; }
-        .btn { background: linear-gradient(45deg, #ff3300, #ff0055); border: none; color: white; padding: 20px; width: 100%; border-radius: 15px; font-weight: 800; margin-top: 30px; cursor: pointer; text-transform: uppercase; }
+        body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        .card { background: #111; padding: 30px; border-radius: 25px; border: 1px solid #222; width: 85%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn { background: linear-gradient(45deg, #ff3300, #ff0055); border: none; color: white; padding: 20px; width: 100%; border-radius: 15px; font-weight: 800; margin-top: 20px; cursor: pointer; text-transform: uppercase; transition: transform 0.1s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-download { background: #222; border: 1px solid #333; margin-top: 10px; font-size: 12px; padding: 12px; }
         .status-off { color: #ff3300; font-weight: bold; }
         .status-on { color: #00ff88; font-weight: bold; }
+        .expiry-box { font-size: 12px; color: #555; margin-top: 15px; }
+        #expiry { color: #00ff88; font-size: 16px; font-weight: bold; }
+        .hint { font-size: 11px; color: #444; margin-top: 20px; line-height: 1.4; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2 id="name">привет!</h2>
-        <p>статус: <span id="status" class="status-off">OFF</span></p>
-        <p style="font-size: 12px; color: #555;">подписка до: <br><span id="expiry" style="color: #00ff88; font-size: 16px;">--.--.----</span></p>
-        <button class="btn" onclick="connect()">Подключить</button>
+        <p>статус доступа: <span id="status" class="status-off">OFF</span></p>
+        
+        <div class="expiry-box">
+            подписка активна до:<br>
+            <span id="expiry">--.--.----</span>
+        </div>
+
+        <button class="btn" onclick="connect()">Подключить VPN</button>
+        <button class="btn btn-download" onclick="downloadHapp()">Скачать Happ Proxy</button>
+
+        <p class="hint">нажми «подключить», ключ скопируется автоматически, затем выбери «открыть» в приложении</p>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
         const params = new URLSearchParams(window.location.search);
         const vpnKey = params.get('key');
         const expiryDate = params.get('expiry');
 
+        // Установка имени пользователя
         if (tg.initDataUnsafe?.user) {
             document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
+
+        // Установка даты истечения
         if (expiryDate && expiryDate !== "none") {
             document.getElementById('expiry').innerText = expiryDate.split(' ')[0];
+            document.getElementById('status').innerText = 'READY';
+            document.getElementById('status').className = 'status-on';
         }
 
         function connect() {
@@ -42,20 +61,31 @@
                 return;
             }
 
-            // Магия: используем метод Telegram, чтобы не было ошибки неизвестного протокола
-            // Это заставит систему перехватить vless:// и открыть Happ Proxy
-            if (tg.openLink) {
-                tg.openLink(vpnKey);
-            } else {
-                window.location.href = vpnKey;
-            }
+            // 1. Копируем ключ в буфер обмена (для подстраховки)
+            const el = document.createElement('textarea');
+            el.value = vpnKey;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
 
-            document.getElementById('status').innerText = 'ON';
-            document.getElementById('status').className = 'status-on';
             tg.HapticFeedback.notificationOccurred('success');
 
-            // Небольшая задержка перед закрытием, чтобы пользователь увидел смену статуса
-            setTimeout(() => { tg.close(); }, 1500); 
+            // 2. Пытаемся открыть приложение напрямую через протокол vless://
+            // Telegram WebApp умеет корректно обрабатывать такие ссылки
+            tg.openLink(vpnKey);
+
+            // 3. Визуальный фидбек
+            document.getElementById('status').innerText = 'OPENING...';
+            
+            // Закрываем мини-апп через пару секунд, чтобы юзер успел понять, что произошло
+            setTimeout(() => { tg.close(); }, 3000);
+        }
+
+        function downloadHapp() {
+            // Ссылка на Android версию. Для iOS можно добавить проверку платформы, 
+            // но для начала хватит и этой.
+            tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android");
         }
     </script>
 </body>
