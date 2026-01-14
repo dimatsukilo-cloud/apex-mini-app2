@@ -7,12 +7,15 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; width: 90%; max-width: 400px; }
-        .btn { background: linear-gradient(45deg, #ff3300, #ff0055); color: #fff; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; text-transform: uppercase; transition: 0.1s; display: block; text-decoration: none; }
+        .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn { background: linear-gradient(45deg, #ff3300, #ff0055); color: #fff; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; text-transform: uppercase; transition: transform 0.1s; display: block; text-decoration: none; }
         .btn:active { transform: scale(0.96); opacity: 0.8; }
         .btn-down { background: #222; color: #888; font-size: 12px; margin-top: 10px; border: 1px solid #333; }
+        .btn-ios { color: #00a2ff; border-color: #00a2ff44; }
+        .btn-android { color: #00ff88; border-color: #00ff8844; }
         #expiry { color: #00ff88; font-weight: bold; }
-        .status { color: #00ff88; font-size: 14px; margin-bottom: 10px; display: block; }
+        .status { color: #00ff88; font-size: 14px; margin-bottom: 10px; display: block; opacity: 0.8; }
+        .help-text { font-size: 11px; color: #444; margin-top: 15px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -23,9 +26,19 @@
 
         <button class="btn" style="width: 100%;" onclick="copyKey()">Скопировать ключ</button>
         
-        <button class="btn btn-down" onclick="tg.openLink('https://play.google.com/store/search?q=Happ%20Proxy%20Utility&c=apps')">Найти в Play Market</button>
+        <button class="btn btn-down btn-android" style="width: 100%;" 
+                onclick="tg.openLink('https://play.google.com/store/search?q=Happ%20Proxy%20Utility&c=apps')">
+                Скачать для Android (Happ)
+        </button>
+
+        <button class="btn btn-down btn-ios" style="width: 100%;" 
+                onclick="tg.openLink('https://apps.apple.com/app/v2box-v2ray-client/id1641370530')">
+                Скачать для iPhone (V2Box)
+        </button>
         
-        <p style="font-size: 11px; color: #444; margin-top: 15px;">Если ссылка не открылась, просто вбей в поиске Маркета: <b>Happ Proxy Utility</b></p>
+        <div class="help-text">
+            После копирования ключа установи приложение для своего телефона и нажми кнопку импорта (буфер обмена).
+        </div>
     </div>
 
     <script>
@@ -37,10 +50,12 @@
         const vpnKey = params.get('key');
         const expiryDate = params.get('expiry');
 
+        // Имя пользователя
         if (tg.initDataUnsafe?.user) {
             document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
 
+        // Логика даты подписки
         if (expiryDate && expiryDate !== "none" && expiryDate !== "не активна") {
             document.getElementById('expiry').innerText = expiryDate.split(' ')[0];
         } else {
@@ -52,13 +67,15 @@
                 tg.showAlert("у тебя нет активной подписки!");
                 return;
             }
+            
             const el = document.createElement('textarea');
             el.value = vpnKey;
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            tg.showAlert("✅ Ключ скопирован!\n\nТеперь открой Happ Proxy и нажми кнопку добавить.");
+            
+            tg.showAlert("✅ Ключ скопирован!\n\nТеперь установи приложение и нажми кнопку импорта из буфера обмена.");
         }
     </script>
 </body>
