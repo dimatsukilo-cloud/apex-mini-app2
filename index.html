@@ -7,11 +7,12 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; width: 90%; max-width: 400px; }
-        .btn { background: linear-gradient(45deg, #ff3300, #ff0055); color: #fff; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; text-transform: uppercase; width: 100%; }
+        .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn { background: linear-gradient(45deg, #ff3300, #ff0055); color: #fff; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; text-transform: uppercase; width: 100%; transition: transform 0.1s; }
+        .btn:active { transform: scale(0.98); }
         .btn-down { background: #222; color: #888; font-size: 12px; margin-top: 10px; border: 1px solid #333; }
         #expiry { color: #00ff88; font-weight: bold; }
-        .status { color: #00ff88; font-size: 14px; margin-bottom: 10px; display: block; }
+        .status { color: #00ff88; font-size: 14px; margin-bottom: 10px; display: block; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -19,10 +20,10 @@
         <h2 id="name">привет!</h2>
         <span class="status">● Система готова</span>
         <p style="font-size: 14px; color: #555;">подписка до: <br><span id="expiry">загрузка...</span></p>
-        
+
         <button class="btn" onclick="copyKey()">Скопировать ключ</button>
         <button class="btn btn-down" onclick="downloadHapp()">Скачать Happ Proxy</button>
-        
+
         <p style="font-size: 11px; color: #444; margin-top: 15px;">После копирования вставь ключ в Happ Proxy</p>
     </div>
 
@@ -53,7 +54,6 @@
                 return;
             }
 
-            // Копирование
             const el = document.createElement('textarea');
             el.value = vpnKey;
             document.body.appendChild(el);
@@ -65,8 +65,15 @@
         }
 
         function downloadHapp() {
-            // Самый надежный способ для Google Play в Mini App
-            tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android");
+            const storeUrl = "https://play.google.com/store/apps/details?id=com.happproxy.android";
+            
+            // Пытаемся открыть через метод Телеграма с отключенным предпросмотром
+            try {
+                tg.openLink(storeUrl, {try_instant_view: false});
+            } catch (e) {
+                // Если не сработало — используем стандартный метод браузера
+                window.open(storeUrl, '_blank');
+            }
         }
     </script>
 </body>
