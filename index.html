@@ -34,7 +34,6 @@
             if (tg.initDataUnsafe?.user) {
                 document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
             }
-
             if (exp && exp !== "none" && exp !== "не" && exp !== "не активна") {
                 document.getElementById('expiry').innerText = exp.split(' ')[0];
             } else {
@@ -48,7 +47,7 @@
                 return;
             }
 
-            // копируем ключ
+            // 1. Копируем ключ (всегда полезно)
             const i = document.createElement('input');
             i.value = key;
             document.body.appendChild(i);
@@ -56,17 +55,17 @@
             document.execCommand('copy');
             document.body.removeChild(i);
 
+            // 2. Открываем приложение ТОЛЬКО через метод TG, чтобы не было ERR_UNKNOWN_URL_SCHEME
             tg.showConfirm("ключ скопирован! открыть Happ Proxy?", (ok) => {
                 if (ok) {
-                    // новый способ открытия через прямой редирект
-                    window.location.href = key;
+                    tg.openLink(key); 
                 }
             });
         }
 
         function download() {
-            // пробуем сначала через прямой редирект, так надежнее всего
-            window.location.href = "https://play.google.com/store/apps/details?id=com.happproxy.android";
+            // Для внешних сайтов используем этот метод, он самый надежный в Мини Аппах
+            tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android", {try_instant_view: false});
         }
     </script>
 </body>
