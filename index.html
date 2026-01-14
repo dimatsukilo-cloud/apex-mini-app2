@@ -6,7 +6,7 @@
     <title>Apex VPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; width: 90%; max-width: 400px; }
         .btn { background: linear-gradient(45deg, #ff3300, #ff0055); color: #fff; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; text-transform: uppercase; }
         .btn-down { background: #222; color: #888; font-size: 12px; margin-top: 10px; border: 1px solid #333; }
@@ -30,21 +30,25 @@
         const key = params.get('key');
         const exp = params.get('expiry');
 
-        if (tg.initDataUnsafe?.user) {
-            document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
-        }
+        window.onload = () => {
+            if (tg.initDataUnsafe?.user) {
+                document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
+            }
 
-        if (exp && exp !== "none" && exp !== "не") {
-            document.getElementById('expiry').innerText = exp.split(' ')[0];
-        } else {
-            document.getElementById('expiry').innerText = "не активна";
-        }
+            if (exp && exp !== "none" && exp !== "не" && exp !== "не активна") {
+                document.getElementById('expiry').innerText = exp.split(' ')[0];
+            } else {
+                document.getElementById('expiry').innerText = "не активна";
+            }
+        };
 
         function connect() {
             if (!key || key === "none") {
                 tg.showAlert("у тебя нет активной подписки!");
                 return;
             }
+
+            // копируем ключ
             const i = document.createElement('input');
             i.value = key;
             document.body.appendChild(i);
@@ -53,12 +57,16 @@
             document.body.removeChild(i);
 
             tg.showConfirm("ключ скопирован! открыть Happ Proxy?", (ok) => {
-                if (ok) tg.openLink(key);
+                if (ok) {
+                    // новый способ открытия через прямой редирект
+                    window.location.href = key;
+                }
             });
         }
 
         function download() {
-            tg.openLink("https://play.google.com/store/apps/details?id=com.happproxy.android", {try_instant_view: false});
+            // пробуем сначала через прямой редирект, так надежнее всего
+            window.location.href = "https://play.google.com/store/apps/details?id=com.happproxy.android";
         }
     </script>
 </body>
