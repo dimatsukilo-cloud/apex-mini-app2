@@ -9,7 +9,7 @@
         body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         .card { background: #111; border-radius: 20px; padding: 25px; border: 1px solid #222; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .btn { background: linear-gradient(45deg, #ff3300, #ff0055); color: #fff; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; text-transform: uppercase; transition: transform 0.1s; }
-        .btn:active { transform: scale(0.98); }
+        .btn:active { transform: scale(0.95); }
         .btn-down { background: #222; color: #888; font-size: 12px; margin-top: 10px; border: 1px solid #333; }
         #expiry { color: #00ff88; font-weight: bold; }
         .status { color: #00ff88; font-size: 14px; margin-bottom: 10px; display: block; opacity: 0.8; }
@@ -36,12 +36,10 @@
         const vpnKey = params.get('key');
         const expiryDate = params.get('expiry');
 
-        // Имя пользователя из данных телеграма
         if (tg.initDataUnsafe?.user) {
             document.getElementById('name').innerText = `привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
 
-        // Логика отображения даты подписки
         if (expiryDate && expiryDate !== "none" && expiryDate !== "не активна") {
             document.getElementById('expiry').innerText = expiryDate.split(' ')[0];
         } else {
@@ -53,29 +51,27 @@
                 tg.showAlert("у тебя нет активной подписки!");
                 return;
             }
-
-            // Создаем временный элемент для копирования
             const el = document.createElement('textarea');
             el.value = vpnKey;
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-
-            tg.showAlert("✅ Ключ скопирован!\n\nТеперь открой Happ Proxy и добавь новый конфиг.");
+            tg.showAlert("✅ Ключ скопирован!\n\nТеперь открой Happ Proxy и добавь этот конфиг.");
         }
 
         function downloadHapp() {
-            // Исправленный ID приложения для Happ Proxy Utility
+            // ID приложения со скрина: com.happdev.happproxy
             const storeUrl = "https://play.google.com/store/apps/details?id=com.happdev.happproxy";
+            const marketUrl = "market://details?id=com.happdev.happproxy";
             
-            try {
-                // Пытаемся открыть через встроенный метод
+            // Пытаемся вызвать системную команду маркета (это обходит ошибку 'файл не найден')
+            window.location.href = marketUrl;
+
+            // Запасной вариант через 500мс
+            setTimeout(() => {
                 tg.openLink(storeUrl, {try_instant_view: false});
-            } catch (e) {
-                // Если не вышло — обычный редирект
-                window.location.href = storeUrl;
-            }
+            }, 500);
         }
     </script>
 </body>
